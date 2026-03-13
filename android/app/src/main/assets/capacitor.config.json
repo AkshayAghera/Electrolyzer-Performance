@@ -6,7 +6,7 @@
 		"SplashScreen": {
 			"launchShowDuration": 3000,
 			"launchAutoHide": true,
-			"androidSplashResourceName": "splash",
+			"androidSplashResourceName": "plant_logo",
 			"androidScaleType": "fitCenter",
 			"showSpinner": false,
 			"splashFullScreen": true,

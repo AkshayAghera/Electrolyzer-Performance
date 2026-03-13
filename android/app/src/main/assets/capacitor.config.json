@@ -1,0 +1,17 @@
+{
+	"appId": "com.electrolyzer.calculator",
+	"appName": "Electrolyzer Calculator",
+	"webDir": "www",
+	"plugins": {
+		"SplashScreen": {
+			"launchShowDuration": 3000,
+			"launchAutoHide": true,
+			"androidSplashResourceName": "splash",
+			"androidScaleType": "fitCenter",
+			"showSpinner": false,
+			"splashFullScreen": true,
+			"splashImmersive": true,
+			"useDialog": true
+		}
+	}
+}

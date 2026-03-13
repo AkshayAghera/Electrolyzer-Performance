@@ -1,0 +1,2833 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="EMS">
+<link rel="apple-touch-icon" href="icon-192x192.png">
+<meta name="theme-color" content="#0f172a">
+<link rel="manifest" href="./manifest.json">
+<meta name="theme-color" content="#0f172a">
+<title>Electrolyser Calculator — Standalone (Embed Logo)</title>
+<style>
+h1{
+  font-size: 22px;
+  font-weight: 700;
+}
+
+h3{
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+h4{
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: var(--accent);
+}
+/* ===============================
+   GLOBAL BASE STYLE – STEP 1
+   =============================== */
+
+:root{
+  /* Base */
+  --bg: #f8fafc;
+  --card: #ffffff;
+  --border: #e5e7eb;
+
+  /* Text */
+  --text-main: #0f172a;
+  --text-muted: #475569;
+
+  /* Accent (engineering blue) */
+  --accent: #2563eb;
+  --accent-soft: #eff6ff;
+
+  /* Status */
+  --ok: #16a34a;
+  --warn: #f59e0b;
+  --bad: #dc2626;
+}
+
+h1 {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.3px;
+}
+
+h2 {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+h3 {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+h4 {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1f2937;
+}
+.stat .value {
+  font-size: 18px;
+  font-weight: 700;
+  color: #020617;
+  letter-spacing: 0.2px;
+}
+
+.stat .label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: var(--muted);
+}
+/* ===============================
+   STATUS COLORS – SEMANTIC
+   =============================== */
+
+/* Good / Normal */
+.text-ok { color: var(--ok); }
+.bg-ok   { background: #dcfce7; }
+
+/* Attention */
+.text-warn { color: var(--warn); }
+.bg-warn   { background: #ffedd5; }
+
+/* Critical */
+.text-crit { color: var(--crit); }
+.bg-crit   { background: #fee2e2; }
+/* ===============================
+   COMPUTED LIVE PANEL
+   =============================== */
+
+.expert-panel h4 {
+  margin-bottom: 8px;
+}
+
+.expert-panel .stat {
+  background: linear-gradient(180deg, #ffffff, #f8fafc);
+  border: 1px solid #e5e7eb;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.expert-panel .stat:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(15,23,42,0.08);
+}
+/* ===============================
+   TABLE READABILITY
+   =============================== */
+
+table th {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: #374151;
+}
+
+table td {
+  font-size: 13px;
+  color: #020617;
+}
+
+  :root{--bg:#f7fafc;--card:#fff;--muted:#6b7280;--crit: #dc2626;}
+  body{font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;margin:0;background:var(--bg);color:#0f172a;padding:18px;}
+  /* ===== MAIN PAGE WIDTH CONTROL ===== */
+.wrap{
+  max-width: 1400px;   /* 👈 desktop width increase */
+  width: 100%;
+  margin: 0 auto;
+}
+  .header{display:flex;align-items:center;gap:80px;margin-bottom:18px}
+  .logo-wrap{width:200px;height:72px;display:flex;align-items:center;justify-content:flex-start}
+  .title{line-height:1}
+  .title h1{font-size:25px;margin:0}
+  .title p{margin:8px 0 0 0;font-size:16px;color:#374151}
+  p.lead{margin:0 0 12px;color:var(--muted)}
+  .card{
+  background: var(--card);
+  padding: 14px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+  margin-bottom: 14px;
+}
+  label{display:block;font-size:16px;color:var(--muted);margin-bottom:6px}
+input[type=number],
+input[type=text],
+select{
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: 16px;
+  background: #ffffff;
+}
+
+input:focus,
+select:focus{
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px rgba(37,99,235,0.12);
+}
+.grid2{
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+}
+
+@media (min-width: 1400px){
+  .grid2{
+    grid-template-columns: 1fr 1fr;
+  }
+}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.stat{
+  padding: 10px;
+  background: var(--accent-soft);
+  border-radius: 8px;
+  border: 1px solid #dbeafe;
+  margin-bottom: 8px;
+}
+
+.stat .label{
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.stat .value{
+  font-weight: 700;
+  font-size: 16px;
+  margin-top: 6px;
+  color: var(--text-main);
+}  
+.controls{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+button{
+   padding: 10px 16px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 13px;
+    cursor: pointer;
+	background: #475569; color: white;
+    border: none;
+    transition: all 0.2s ease;
+}
+
+button:hover{
+  transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+  table{
+  width:100%;
+  border-collapse:collapse;
+  font-size:13px;
+  table-layout: fixed;   /* 🔑 FORCE alignment */
+}
+th, td{
+  padding:6px 8px;
+  text-align:center;
+  white-space:nowrap;    /* stop wrapping */
+}
+
+
+/* Left-align text columns */
+th:nth-child(1),
+td:nth-child(1),
+th:nth-child(2),
+td:nth-child(2),
+th:nth-child(3),
+td:nth-child(3){
+  text-align:left;
+}
+
+/* Fixed column widths for numeric consistency */
+th:nth-child(1), td:nth-child(1){ width:50px; }   /* Electrolyser */
+th:nth-child(2), td:nth-child(2){ width:90px; }   /* Rectifier */
+th:nth-child(3), td:nth-child(3){ width:90px; }   /* Plant */
+th:nth-child(4), td:nth-child(4){ width:90px; }   /* StdV5 */
+th:nth-child(5), td:nth-child(5){ width:90px; }   /* DC5 */
+th:nth-child(6), td:nth-child(6){ width:90px; }   /* K */
+th:nth-child(7), td:nth-child(7){ width:90px; }   /* K@5CD */
+th:nth-child(8), td:nth-child(8){ width:90px; }   /* Prod */
+th:nth-child(9), td:nth-child(9){ width:110px; }  /* Action */
+/* Rectifier summary table */
+#rectiSummary table{
+  table-layout: fixed;
+}
+
+#rectiSummary th:nth-child(1),
+#rectiSummary td:nth-child(1){ width:120px; text-align:left; }
+
+#rectiSummary th:nth-child(2),
+#rectiSummary td:nth-child(2){ width:60px; }
+
+#rectiSummary th:nth-child(3),
+#rectiSummary td:nth-child(3){ width:140px; }
+
+#rectiSummary th:nth-child(4),
+#rectiSummary td:nth-child(4){ width:140px; }
+  th,td{padding:6px 4px;text-align:left}
+  .chart-wrap{overflow:auto}
+  .note{font-size:12px;color:#6b7280;margin-top:4px}
+  @media (max-width:900px){ .grid2{grid-template-columns:1fr} }
+/* ==============================
+   STATUS BADGE (MONITORING)
+   ============================== */
+.status-badge {
+  display: inline-block;
+  margin-top: 6px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.status-normal {
+  background-color: #dcfce7;
+  color: #166534;
+}
+
+.status-attention {
+  background-color: #ffedd5;
+  color: #9a3412;
+}
+
+.status-critical {
+  background-color: #fee2e2;
+  color: #;
+}
+.status-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(42px, 1fr));
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.status-cell {
+  text-align: center;
+  padding: 6px 0;
+  border-radius: 6px;
+  font-weight: 700;
+  font-size: 13px;
+  color: #ffffff;
+}
+
+.status-ok {
+  background: #16a34a;
+}
+
+.status-warn {
+  background: #d97706;
+}
+
+.status-crit {
+  background: #fee2e2;
+}
+
+.status-na {
+  background: #9ca3af;
+}
+.mode-status-row {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  flex-wrap: wrap; /* mobile safety */
+}
+
+.mode-status-row .card {
+  margin-bottom: 0; /* remove extra spacing */
+}
+.status-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.status-box {
+  width: 34px;
+  height: 26px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+}
+
+.status-normal {
+  background: #bbf7d0;   /* light green */
+  color: #065f46;        /* dark readable text */
+}
+.status-attention { background:#f59e0b; }
+.status-critical { background:#dc2626; }
+.status-na { background:#9ca3af; }
+@keyframes criticalPulse {
+  0%   { box-shadow: 0 0 0 0 rgba(220,38,38,0.6); }
+  50%  { box-shadow: 0 0 0 6px rgba(220,38,38,0); }
+  100% { box-shadow: 0 0 0 0 rgba(220,38,38,0); }
+}
+
+.status-critical {
+  animation: criticalPulse 1.8s infinite;
+}
+.status-box {
+  position: relative;
+}
+
+.status-tooltip {
+  position: absolute;
+  bottom: 115%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #111827;
+  color: #ffffff;
+  padding: 6px 8px;
+  border-radius: 6px;
+  font-size: 11px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+  z-index: 50;
+}
+
+.status-box:hover .status-tooltip {
+  opacity: 1;
+}
+/* === HARD MOBILE OVERFLOW FIX === */
+@media (max-width: 768px) {
+  .wrap {
+    max-width: 100% !important;
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+}
+@media (max-width: 768px) {
+  .card {
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+}
+@media (max-width: 768px) {
+  .grid2,
+  .row2 {
+    grid-template-columns: 1fr !important;
+    min-width: 0;
+  }
+}
+@media (max-width: 768px) {
+  table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+}
+/* ===== FIX HEADER OVERFLOW ===== */
+@media (max-width: 768px) {
+  .wrap.header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .logo-wrap {
+    max-width: 100%;
+  }
+}
+/* ===== FINAL MOBILE LAYOUT FIX ===== */
+
+/* Prevent page-level horizontal overflow */
+body {
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
+/* Wrap must never exceed viewport */
+@media (max-width: 768px) {
+  .wrap {
+    max-width: 100vw !important;
+    padding-left: 8px;
+    padding-right: 8px;
+  }
+
+  .card {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+
+  .grid2,
+  .row2 {
+    grid-template-columns: 1fr !important;
+    min-width: 0;
+  }
+}
+
+/* ===== GRAPH CONTAINER – FULL WIDTH ===== */
+.chart-wrap{
+  width: 100%;
+  overflow-x: hidden;   /* 👈 stop scroll */
+  overflow-y: hidden;
+}
+/* ===============================
+   UNIFIED PANEL LOOK (EXPERT)
+   =============================== */
+
+.expert-panel {
+  background: #fbfdff;              /* same as stat bg */
+  border: 1px solid #eef2ff;
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 12px;
+}
+/* ===============================
+   INPUT FIELDS – CARD FEEL
+   =============================== */
+
+/* Applies only to panels we wrapped with expert-panel */
+.expert-panel input,
+.expert-panel select {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  padding: 8px;
+}
+
+/* Slightly stronger labels like Computed cards */
+.expert-panel label {
+  font-weight: 500;
+  color: #374151;
+}
+/* ===============================
+   FIX ROW2 INPUT OVERLAP
+   =============================== */
+
+.expert-panel .row2 {
+  gap: 12px;              /* 👈 THIS fixes border touching */
+}
+.expert-panel input,
+.expert-panel select {
+  box-sizing: border-box;
+  width: 100%;
+}
+.expert-panel .row2 > div {
+  min-width: 0;
+}
+/* ===============================
+   GRAPH WIDTH – FINAL FIX
+   =============================== */
+
+body.expert-mode .chart-wrap svg {
+  width: auto !important;        /* respect JS width */
+  min-width: 1200px;             /* desktop default */
+  max-width: none;
+}
+
+@media (max-width: 1024px) {
+  body.expert-mode .chart-wrap svg {
+    min-width: 1000px;
+  }
+}
+
+@media (max-width: 768px) {
+  body.expert-mode .chart-wrap svg {
+    min-width: 900px;
+  }
+}
+/* ===== TABLE CLEANUP (REPORT STYLE) ===== */
+table.report-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+table.report-table th {
+  text-align: left;
+  font-weight: 600;
+  padding: 8px 6px;
+  border-bottom: 2px solid #e5e7eb;
+}
+
+table.report-table td {
+  padding: 6px;
+  border-bottom: 1px solid #f1f5f9;
+  vertical-align: middle;
+}
+
+table.report-table td.num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+table.report-table tr:nth-child(even) {
+  background: #f9fafb;
+}
+
+.btn-xs {
+  padding: 2px 8px;
+  font-size: 12px;
+}
+/* ===== OPTIONAL TABLE VISUAL IMPROVEMENT ===== */
+table th {
+  background: #f8fafc;
+  font-weight: 600;
+}
+
+table td,
+table th {
+  border-bottom: 1px solid #e5e7eb;
+}
+/* ===============================
+   RECTIFORMER A..F – COMPACT TABLE
+   =============================== */
+
+.recti-table-wrap{
+  display: flex;
+  justify-content: left;   /* left table */
+}
+
+.recti-table-wrap table{
+  width: auto;               /* 👈 shrink to content */
+  min-width: 520px;          /* 👈 clean readable width */
+  max-width: 700px;
+  table-layout: fixed;
+}
+
+.recti-table-wrap th,
+.recti-table-wrap td{
+  padding: 8px 14px;
+  text-align: center;
+  white-space: nowrap;
+}
+
+/* Rectifier name left aligned */
+.recti-table-wrap th:first-child,
+.recti-table-wrap td:first-child{
+  text-align: left;
+}
+/* ===============================
+   RECTIFORMER PERFORMANCE COLORS
+   =============================== */
+
+.recti-best {
+  background: #dcfce7;
+  color: #065f46;
+  font-weight: 700;
+}
+
+.recti-worst {
+  background: #fee2e2;
+  color: #991b1b;
+  font-weight: 700;
+}
+
+.recti-mid {
+  background: #eff6ff;
+  color: #1e3a8a;
+}
+/* ===============================
+   TREND INDICATORS
+   =============================== */
+
+.trend {
+  font-size: 12px;
+  font-weight: 700;
+  margin-left: 6px;
+}
+
+.trend-up {
+  color: #16a34a; /* green */
+}
+
+.trend-down {
+  color: #dc2626; /* red */
+}
+
+.trend-flat {
+  color: #64748b; /* gray */
+}
+/* Add this inside your <style> tag */
+.control-strip {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    background: #f1f5f9;
+    padding: 15px;
+    border-radius: 12px;
+    align-items: flex-end;
+    margin-bottom: 20px;
+}
+
+.button-row { display: flex; gap: 10px; }
+
+.btn-pro {
+    padding: 10px 16px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 13px;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s ease;
+}
+
+.btn-generate { background: #475569; color: white; }
+.btn-export { background: #0f172a; color: white; }
+.btn-data { background: #ffffff; color: #0f172a; border: 1px solid #cbd5e1; }
+
+.btn-pro:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1)
+}
+
+.pro-input {
+    height: 38px;
+    border-radius: 8px;
+    border: 1px solid #cbd5e1;
+    padding: 0 10px;
+}
+/* ===============================
+   MODERN HEALTH DASHBOARD STYLES
+   =============================== */
+
+/* 1. Enhanced Summary Grid */
+.health-summary-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+.health-summary-grid .card {
+    background: #ffffff;
+    padding: 16px;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 0; /* Override default card margin */
+    transition: transform 0.2s ease;
+}
+
+.health-summary-grid .card:hover {
+    transform: translateY(-2px);
+}
+
+/* Vertical Accent Bars for Summary */
+#health-total-card { border-left: 10px solid #64748b; }
+#health-ok-card { border-left: 10px solid #22c55e; }
+#health-warn-card { border-left: 10px solid #f59e0b; }
+#health-crit-card { border-left: 10px solid #ef4444; }
+
+.health-summary-grid .label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #64748b;
+    font-weight: 700;
+}
+
+.health-summary-grid .value {
+    font-size: 20px;
+    font-weight: 800;
+    margin-top: 4px;
+    color: #0f172a;
+}
+
+/* 2. Professional Status Matrix (A, B, C...) */
+.status-box {
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 14px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid rgba(0,0,0,0.05);
+    cursor: default;
+}
+
+.status-normal {
+    background: linear-gradient(135deg, #22c55e, #16a34a) !important;
+    color: white !important;
+    box-shadow: 0 2px 4px rgba(22, 163, 74, 0.2);
+}
+
+.status-attention {
+    background: linear-gradient(135deg, #f59e0b, #d97706) !important;
+    color: white !important;
+    box-shadow: 0 2px 4px rgba(217, 119, 6, 0.2);
+}
+
+.status-critical {
+    background: linear-gradient(135deg, #ef4444, #dc2626) !important;
+    color: white !important;
+    box-shadow: 0 4px 12px rgba(220, 38, 38, 0.4);
+    animation: alert-pulse 1.8s infinite;
+}
+
+/* 3. Alert Animation */
+@keyframes alert-pulse {
+    0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+    70% { transform: scale(1.05); box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+    100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+}
+
+/* 4. Dashboard Legend Style */
+.status-legend {
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    margin-top: 15px; 
+    padding: 12px; 
+    background: #f8fafc; 
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+}
+/* Ensure the Health Panel Card matches the full width of other cards */
+.health-summary-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    width: 100%; /* Force full width */
+    box-sizing: border-box;
+    margin-bottom: 20px;
+}
+
+/* Ensure the main container for the matrix is also full width */
+#healthMatrix {
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: flex-start;
+}
+
+/* Fix for mobile: if the screen is small, make them 2x2 instead of 4x1 */
+@media (max-width: 600px) {
+    .health-summary-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+/* Force the Health Matrix to take up 100% of the card width */
+#healthMatrix {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between; /* 👈 This stretches the boxes to both edges */
+    gap: 8px; /* Spacing between boxes */
+    width: 100%;
+    box-sizing: border-box;
+    margin-top: 10px;
+}
+
+/* Adjust the box size so they fit better in a single row on desktop */
+.status-box {
+    flex: 1 1 auto; /* 👈 Allows boxes to grow to fill space */
+    min-width: 40px; 
+    max-width: 65px; /* Prevents boxes from becoming too wide on huge screens */
+    height: 38px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+}
+.health-card-light {
+    background-color: #fdfdfd !important;
+    background-size: 20px 20px !important; /* This creates a technical dot grid */
+    border: 2px solid #cbd5e1 !important;
+}
+
+.health-card-light h3 {
+    background: #f1f5f9;
+    margin: -14px -14px 14px -14px;
+    padding: 12px 14px;
+    border-bottom: 1px solid #e2e8f0;
+    border-radius: 10px 10px 0 0;
+}
+</style>
+</head>
+<body>
+<div class="wrap header">
+  <div class="logo-wrap" aria-hidden="true">
+    <!-- ======= REPLACE THE IMAGE HERE =======
+         Replace the PASTE_BASE64_HERE token below with your PNG base64 string.
+         Example final src value:
+         src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgA..."
+    -->
+    <img id="uiLogo" src="data:image/png;base64,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" alt="GACL logo" style="height:72px;object-fit:contain;" onerror="this.style.display='none'" />
+    <!-- If you do not want to embed base64, replace the <img> tag above with:
+         <img src="gacl-logo.png" alt="GACL logo" style="height:72px;object-fit:contain;" />
+         and save the PNG next to this HTML. -->
+  </div>
+
+  <div class="title">
+    <h1>Electrolyser Performance Monitoring System (Caustic Soda Plant)</h1>
+    <p>Prepared by <strong>Akshay Aghera (CSP - Process)</strong></p>
+  </div>
+</div>
+<div class="wrap">
+  <div class="mode-status-row">
+  <div class="card" style="margin:8px 0 16px 0;">
+  <div style="display:flex; gap:16px; align-items:flex-start; flex-wrap:wrap">
+
+    <!-- MODE SELECTOR -->
+    <div style="min-width:260px">
+      <label>Mode</label>
+      <select id="modeSelector">
+        <option value="SIMPLE">Simple (Operators)</option>
+        <option value="EXPERT">Expert (Engineers)</option>
+      </select>
+      <p class="note">
+        Simple mode shows only key inputs & results. Expert mode shows full analysis, tables, and graphs.
+      </p>
+    </div>
+<div class="card health-card-light" style="width: 100%; box-sizing: border-box;">
+  <h3>PLANT HEALTH OVERVIEW</h3>
+  <div class="health-summary-grid">
+    <div class="card" id="health-total-card">
+      <span class="label">Electrolyser Monitored</span>
+      <div class="value" id="health-total">0</div>
+    </div>
+    <div class="card" id="health-ok-card">
+      <span class="label">Normal</span>
+      <div class="value" id="health-ok">0</div>
+    </div>
+    <div class="card" id="health-warn-card">
+      <span class="label">Attention</span>
+      <div class="value" id="health-warn">0</div>
+    </div>
+    <div class="card" id="health-crit-card">
+      <span class="label">Critical</span>
+      <div class="value" id="health-crit">0</div>
+    </div>
+  </div>
+
+  <h4>Electrolyser Matrix</h4>
+  <div id="healthMatrix" class="status-grid"></div>
+  
+  <div class="status-legend">
+    <div style="font-size: 15px; color: #64748b; font-weight: 700;">Std Volatge @ 5CD</div>
+    <div style="display: flex; gap: 12px; font-size: 15px; font-weight: 500;">
+        <span><i style="color:#22c55e">●</i> Healthy (&lt;3.0V)</span>
+        <span><i style="color:#f59e0b">●</i> Warning (3.0-3.2V)</span>
+        <span><i style="color:#ef4444">●</i> Critical (&gt;3.2V)</span>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <div class="card grid2">
+    <div class="expert-panel">
+  <h3>Active Electrolyser</h3>
+      <label>Electrolyser</label>
+      <select id="electrolyser"></select><label style="margin-top:8px">Generation</label>
+      <select id="generation"><option>4th</option><option>5th</option><option>5thB+</option><option>6thB+</option>
+      </select>
+
+      <div class="row2" style="margin-top:8px">
+        <div>
+          <label>Elements</label>
+          <input id="elements" type="number" value="144" min="1" />
+        </div>
+        <div>
+          <label>Current (kA)</label>
+          <input id="ka" type="number" value="11" step="0.01" />
+        </div>
+	<div>
+          <label>Total Voltage (V)</label>
+          <input id="totalV" type="number" value="440" step="0.1" />
+        </div>
+        <div>
+          <label>Efficiency (%)</label>
+          <input id="eff" type="number" value="90" step="0.1" />
+        </div>
+	<div>
+          <label>Catholyte Concentration (% wt)</label>
+          <input id="conc" type="number" value="31.80" step="0.01" />
+        </div>
+        <div>
+          <label>Catholyte Temperature (°C)</label>
+          <input id="temp" type="number" value="88" step="0.1" />
+        </div>
+      </div>
+
+      <div class="controls">
+        <button id="saveBtn">Save</button>
+        <button id="loadBtn">Load</button>
+        <button id="exportCsvBtn">Export CSV</button>
+	<button id="resetViewBtn" style="background: #d97706;">Reset Dashboard</button>
+        <button id="clearAllBtn" style="background: #dc2626;">Clear All</button>
+	
+      </div>
+
+      <div style="margin-top:12px" class="expert-panel">
+  <h4>Computed (live)</h4>
+<div id="warningBox" style="
+  display:none;
+  margin-bottom:8px;
+  padding:8px;
+  border-radius:6px;
+  background:#fff7ed;
+  border:1px solid #fdba74;
+  color:#9a3412;
+  font-size:13px;">
+</div>
+        <div class="row2">
+  	<div class="stat"><div class="label">CD</div><div id="outCD" class="value">-</div></div>
+  	<div class="stat"><div class="label">Average Voltage</div><div id="outAvgV" class="value">-</div></div>
+	<div class="stat"><div class="label">Std V @3 CD (V)</div><div id="outStdV3" class="value">-</div></div>
+        <div class="stat"><div class="label">Std V @4 CD (V)</div><div id="outStdV4" class="value">-</div></div>
+	<div class="stat"><div class="label">Std V @5 CD (V)</div><div id="outStdV5" class="value">-</div></div>
+	<div class="stat"><div class="label">DC Power (Avg) (kWh/MT)</div><div id="outDCAvg" class="value">-</div></div>
+	<div class="stat"><div class="label">DC Power @3 CD (kWh/MT)</div><div id="outDC3" class="value">-</div></div>
+        <div class="stat"><div class="label">DC Power @4 CD (kWh/MT)</div><div id="outDC4" class="value">-</div></div>
+        <div class="stat"><div class="label">DC Power @5 CD (kWh/MT)</div><div id="outDC5" class="value">-</div></div>
+	<div class="stat"><div class="label">K-Factor (avg)</div><div id="outK" class="value">-</div></div>
+        <div class="stat"><div class="label">K-Factor @5 CD</div><div id="outK5" class="value">-</div></div>
+	<div class="stat"><div class="label">Production (MT/day)</div><div id="outProd" class="value">-</div></div>
+</div>
+    <div>
+      <div class="card">
+        <h4>Electrolyser Report</h4>
+        <div>
+          <label>Name</label>
+          <input id="operatorName" type="text" placeholder="Enter name" />
+        </div>
+        <div style="margin-top:8px">
+          <label>Date</label>
+          <div style="display:flex;gap:6px">
+            <select id="reportDay"></select>
+            <select id="reportMonth"></select>
+            <input id="reportYear" type="number" min="2000" max="2100" style="width:90px" />
+          </div>
+<div style="margin-top:8px">
+  <label>Shift</label>
+  <select id="shiftSelector">
+  <option value="A">Shift A</option>
+  <option value="B">Shift B</option>
+  <option value="C">Shift C</option>
+</select>
+</div>
+        </div>
+        <div style="margin-top:8px">
+          <label>Plant Filter (for graphs & summary)</label>
+          <select id="plantFilter">
+            <option value="ALL">All Plants</option>
+            <option value="Plant-1">Plant-1</option>
+            <option value="Plant-2">Plant-2</option>
+            <option value="Plant-3">Plant-3</option>
+          </select>
+        </div>
+        <p class="note" style="margin-top:8px">
+          Filter applies to: Best/Worst panel, rectiformer averages, all graphs, and the graphs PDF summary.
+          Saved table always shows all electrolysers.
+        </p>
+      </div>
+<div class="card expert-only" style="margin-top: 20px;">
+    <h3>Std Voltage @ 5 CD  (Comparison - Initial Vs Latest Value)</h3>
+    <p class="text-muted" style="font-size: 12px; margin-bottom: 15px;">
+        Comparing the 1st recorded entry against the latest entry.
+    </p>
+    
+    <div id="analysisResults" style="margin-bottom: 15px; border: 1px solid var(--border); border-radius: 8px; overflow: hidden;">
+    </div>
+
+    <button id="runAnalysisBtn" class="btn btn-primary" style="width: 100%;">
+        Compare
+    </button>
+</div>
+      <div class="card expert-only">
+  <h4>Saved Electrolysers (<span id="savedCount">0</span>)</h4>
+        <div id="savedList">No records yet.</div>
+      </div>
+
+      <div class="card expert-only">
+  <h4>Best / Worst Electrolyser</h4>
+        <div id="bestWorst">No data</div>
+      </div>
+
+      <div class="card expert-only">
+  <h4>Rectifier Power</h4>
+        <div id="rectiSummary">No data</div>
+      </div>
+
+      <div class="card expert-only">
+  <h4>Export</h4>
+        <button id="exportPdfBtn">Export All Graphs to PDF</button>
+        <button id="exportDataPdfBtn">Export Data (All Cells Data) to PDF</button>
+              </div>
+    </div>
+  </div>
+<div class="card expert-only">
+  <h3>Graph Selection</h3>
+  
+  <div class="strip-group">
+    <div class="control-strip" style="margin-bottom: 15px;">
+       <select id="graphSelector" class="pro-input" style="width: 100%;">
+          <option value="ALL">All graphs</option>
+          <option value="STDV">StdV5 vs Electrolyser</option>
+          <option value="STD3">StdV3 vs Electrolyser</option>
+          <option value="STD4">StdV4 vs Electrolysers</option>
+          <option value="DCAVG">DC Power (Avg) vs Electrolyser</option>
+          <option value="DC5">DC Power @5 CD vs Electrolyser</option>
+          <option value="DC3">DC Power @3 CD vs Electrolyser</option>
+          <option value="DC4">DC Power @4 CD vs Electrolyser</option>
+          <option value="RECTIFIER">Rectifier Avg DC Power @5 CD</option>
+       </select>
+    </div>
+
+    <div class="button-row">
+       <button id="btnGenerateGraph" class="btn-pro btn-generate" style="width: auto;">
+          Generate Selected Graph
+       </button>
+    </div>
+  </div>
+</div>  
+<div class="card expert-only" id="cardStdV">
+    <h3>Std V @ 5CD per Electrolyser (V)</h3>
+    <div class="chart-wrap">
+      <svg id="stdvPlot" width="900" height="320" style="max-width:100%"></svg>
+    </div>
+    <div class="note">
+  Note: Values are shown for comparison across electrolysers. Only filtered plant is considered.
+</div>
+  </div>
+
+  <div class="card expert-only" id="cardStd3">
+    <h3>Std V @ 3CD per Electrolyser (V)</h3>
+    <div class="chart-wrap">
+      <svg id="std3Plot" width="900" height="320" style="max-width:100%"></svg>
+    </div>
+  </div>
+
+  <div class="card expert-only" id="cardStd4">
+    <h3>Std V @ 4CD per Electrolyser (V)</h3>
+    <div class="chart-wrap">
+      <svg id="std4Plot" width="900" height="320" style="max-width:100%"></svg>
+    </div>
+  </div>
+
+<div class="card expert-only" id="cardDCAvg">
+  <h3>DC Power (Average Voltage) per Electrolyser (kWh/MT)</h3>
+  <div class="chart-wrap">
+    <svg id="dcAvgPlot" width="900" height="320" style="max-width:100%"></svg>
+  </div>
+</div>
+
+  <div class="card expert-only" id="cardDC">
+    <h3>DC Power @5 CD per Electrolyser (kWh/MT)</h3>
+    <div class="chart-wrap">
+      <svg id="dcPlot" width="900" height="320" style="max-width:100%"></svg>
+    </div>
+    <div class="note">
+  Note: DC power values are plotted for performance comparison. Only filtered plant is considered.
+</div>
+  </div>
+
+  <div class="card expert-only" id="cardDC3">
+    <h3>DC Power @3 CD per Electrolyser (kWh/MT)</h3>
+    <div class="chart-wrap">
+      <svg id="dc3Plot" width="900" height="320" style="max-width:100%"></svg>
+    </div>
+  </div>
+
+  <div class="card expert-only" id="cardDC4">
+    <h3>DC Power @4 CD per Electrolyser (kWh/MT)</h3>
+    <div class="chart-wrap">
+      <svg id="dc4Plot" width="900" height="320" style="max-width:100%"></svg>
+    </div>
+  </div>
+
+  <div class="card expert-only" id="cardRectifier">
+    <h3>Rectifier Average DC Power @5 CD(kWh/MT)</h3>
+    <div class="chart-wrap">
+      <svg id="rectiPlot" width="900" height="320" style="max-width:100%"></svg>
+    </div>
+    <div class="note">Note: Green = highest performance rectiformer (lowest average DC@5). Red = lowest performance rectiformer (highest average DC@5). Only rectiformers belonging to filtered plant are considered.</div>
+  </div>
+</div>
+
+<script>
+function updatePlantHealth() {
+    const matrixContainer = document.getElementById('healthMatrix');
+    if (!matrixContainer) return;
+
+    let okCount = 0, warnCount = 0, critCount = 0;
+    matrixContainer.innerHTML = ''; 
+
+    // Loop through all defined electrolysers (A to T)
+    electrolysers.forEach(id => {
+        let statusClass = 'status-na'; // Default is Grey (Not Measured)
+
+        // FIX: Look ONLY at 'saved' (Active Session), NOT historyData
+        if (saved[id]) {
+            // We have data for this unit in THIS session
+            const rec = computeFromInputs({
+                generation: saved[id].generation,
+                elements: saved[id].elementCount,
+                KA: saved[id].KA,
+                totalV: saved[id].totalVoltage,
+                conc: saved[id].cathConc,
+                temp: saved[id].cathTemp,
+                eff: saved[id].effPercent
+            });
+            
+            const v = parseFloat(rec.StdV5);
+
+            if (v >= 3.2) { 
+                statusClass = 'status-critical'; 
+                critCount++; 
+            } else if (v >= 3.0) { 
+                statusClass = 'status-attention'; 
+                warnCount++; 
+            } else { 
+                statusClass = 'status-normal'; 
+                okCount++; 
+            }
+        }
+
+        // Create the box (A, B, C...)
+        const box = document.createElement('div');
+        box.className = `status-box ${statusClass}`;
+        box.textContent = id; // Just the letter
+        matrixContainer.appendChild(box);
+    });
+
+    // Update the summary numbers (Total = only ones measured in this session)
+    const measuredTotal = okCount + warnCount + critCount;
+
+    if(document.getElementById('health-total')) {
+        document.getElementById('health-total').innerText = measuredTotal; // Shows how many you checked today
+        document.getElementById('health-ok').innerText = okCount;
+        document.getElementById('health-warn').innerText = warnCount;
+        document.getElementById('health-crit').innerText = critCount;
+    }
+}
+document.getElementById('runAnalysisBtn').addEventListener('click', () => {
+    const container = document.getElementById('analysisResults');
+    container.innerHTML = ''; 
+    
+    let validUnits = 0;
+    const STABLE_THRESHOLD = 0.001; // 0.1% change is considered stable
+
+    Object.keys(historyData).sort().forEach(unit => {
+        const data = historyData[unit];
+        
+        // Requirement: Minimum 5 entries
+        if (data.length < 5) return;
+
+        validUnits++;
+
+        const firstEntry = data[0];
+        const lastEntry = data[data.length - 1];
+
+        const vFirst = firstEntry.StdV5;
+        const vLast = lastEntry.StdV5;
+        const diff = vLast - vFirst;
+        const percentChange = (diff / vFirst); // fractional change
+
+        // Define Status and Color
+        let statusText = "";
+        let colorCode = "";
+        let bgColor = "";
+
+        if (Math.abs(percentChange) <= STABLE_THRESHOLD) {
+            statusText = "STABLE";
+            colorCode = "#856404"; // Dark Yellow
+            bgColor = "#fff3cd";   // Light Yellow
+        } else if (diff < 0) {
+            statusText = "IMPROVING";
+            colorCode = "#155724"; // Dark Green
+            bgColor = "#d4edda";   // Light Green
+        } else {
+            statusText = "DEGRADING";
+            colorCode = "#721c24"; // Dark Red
+            bgColor = "#f8d7da";   // Light Red
+        }
+
+        const row = document.createElement('div');
+        row.style.cssText = `padding:15px; border-bottom:1px solid #eee; background-color: ${bgColor};`;
+        row.innerHTML = `
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <div>
+                    <strong style="font-size:16px;">${unit}</strong><br>
+                    <span style="font-size:11px; color:#666;">Data Points: ${data.length}</span>
+                </div>
+                <div style="text-align:right;">
+                    <span style="font-weight:bold; color:${colorCode}; font-size:14px;">${statusText}</span><br>
+                    <span style="font-weight:bold; font-size:14px;">${(percentChange * 100).toFixed(2)}% Drift</span>
+                </div>
+            </div>
+            
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-top:10px; font-size:12px; background:rgba(255,255,255,0.5); padding:8px; border-radius:4px;">
+                <div>
+                    <div style="color:#666;">FIRST (${firstEntry.date})</div>
+                    <div style="font-family:monospace; font-weight:bold;">${vFirst.toFixed(4)} V</div>
+                </div>
+                <div style="text-align:right;">
+                    <div style="color:#666;">LAST (${lastEntry.date})</div>
+                    <div style="font-family:monospace; font-weight:bold;">${vLast.toFixed(4)} V</div>
+                </div>
+            </div>
+        `;
+        container.appendChild(row);
+    });
+
+    if (validUnits === 0) {
+        container.innerHTML = '<p style="padding:20px; text-align:center; color:#666;">Not enough data. At least 5 entries per unit are required.</p>';
+    }
+});
+// ----- maps & DOM -----
+const electrolysers = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','P','Q','R','S','T'];
+const rectiMap = { A:'Rectifier-A',B:'Rectifier-A',C:'Rectifier-A',D:'Rectifier-A',
+                   E:'Rectifier-B',F:'Rectifier-B',G:'Rectifier-B',H:'Rectifier-B',
+                   N:'Rectifier-C',I:'Rectifier-C',J:'Rectifier-C',
+                   K:'Rectifier-D',L:'Rectifier-D',M:'Rectifier-D',
+                   P:'Rectifier-E',Q:'Rectifier-E',R:'Rectifier-E',
+                   S:'Rectifier-F',T:'Rectifier-F' };
+const rectiList = ['Rectifier-A','Rectifier-B','Rectifier-C','Rectifier-D','Rectifier-E','Rectifier-F'];
+const plantMap = { 'Rectifier-A':'Plant-1','Rectifier-B':'Plant-1','Rectifier-C':'Plant-2','Rectifier-D':'Plant-2','Rectifier-E':'Plant-3','Rectifier-F':'Plant-3' };
+
+const selElectrolyser = document.getElementById('electrolyser');
+const generationEl = document.getElementById('generation');
+const elementsEl = document.getElementById('elements');
+const kaEl = document.getElementById('ka');
+const totalVEl = document.getElementById('totalV');
+const effEl = document.getElementById('eff');
+const concEl = document.getElementById('conc');
+const tempEl = document.getElementById('temp');
+const operatorNameEl = document.getElementById('operatorName');
+const plantFilterEl = document.getElementById('plantFilter');
+const reportDayEl = document.getElementById('reportDay');
+const reportMonthEl = document.getElementById('reportMonth');
+const reportYearEl = document.getElementById('reportYear');
+const graphSelectorEl = document.getElementById('graphSelector');
+const shiftSelectorEl = document.getElementById('shiftSelector');
+
+const outCD = document.getElementById('outCD');
+const outAvgV = document.getElementById('outAvgV');
+const outDCAvg = document.getElementById('outDCAvg');
+const outStdV3 = document.getElementById('outStdV3');
+const outStdV4 = document.getElementById('outStdV4');
+const outStdV5 = document.getElementById('outStdV5');
+const outDC3 = document.getElementById('outDC3');
+const outDC4 = document.getElementById('outDC4');
+const outDC5 = document.getElementById('outDC5');
+const outK = document.getElementById('outK');
+const outK5 = document.getElementById('outK5');
+const outProd = document.getElementById('outProd');
+
+const savedListDiv = document.getElementById('savedList');
+const savedCountSpan = document.getElementById('savedCount');
+const bestWorstDiv = document.getElementById('bestWorst');
+const rectiSummaryDiv = document.getElementById('rectiSummary');
+
+const stdvPlot = document.getElementById('stdvPlot');
+const std3Plot = document.getElementById('std3Plot');
+const std4Plot = document.getElementById('std4Plot');
+const dcAvgPlot = document.getElementById('dcAvgPlot');
+const dcPlot = document.getElementById('dcPlot');
+const dc3Plot = document.getElementById('dc3Plot');
+const dc4Plot = document.getElementById('dc4Plot');
+const rectiPlot = document.getElementById('rectiPlot');
+
+const cardStdV = document.getElementById('cardStdV');
+const cardStd3 = document.getElementById('cardStd3');
+const cardStd4 = document.getElementById('cardStd4');
+const cardDCAvg = document.getElementById('cardDCAvg');
+const cardDC = document.getElementById('cardDC');
+const cardDC3 = document.getElementById('cardDC3');
+const cardDC4 = document.getElementById('cardDC4');
+const cardRectifier = document.getElementById('cardRectifier');
+
+let saved = {};
+try{
+  const raw = localStorage.getItem('electrolyser_saved_v1');
+  if(raw) saved = JSON.parse(raw);
+}catch(e){console.warn(e);}
+
+let historyData = {};
+try {
+  const rawHist = localStorage.getItem('electrolyser_history_v1');
+  if(rawHist) historyData = JSON.parse(rawHist);
+} catch(e) { console.warn('History load error', e); }
+
+// populate electrolyser select (with recti/plant info)
+electrolysers.forEach(k=>{
+  const opt=document.createElement('option');
+  opt.value=k;
+  opt.text = k+' ('+rectiMap[k]+', '+(plantMap[rectiMap[k]]||'Unknown')+')';
+  selElectrolyser.appendChild(opt);
+});
+
+// populate date selectors
+function initDateSelectors(){
+  for(let d=1; d<=31; d++){
+    const opt=document.createElement('option');
+    opt.value=String(d);
+    opt.text=String(d);
+    reportDayEl.appendChild(opt);
+  }
+  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  months.forEach((m,idx)=>{
+    const opt=document.createElement('option');
+    opt.value=String(idx+1);
+    opt.text=m;
+    reportMonthEl.appendChild(opt);
+  });
+  const today = new Date();
+  reportDayEl.value = String(today.getDate());
+  reportMonthEl.value = String(today.getMonth()+1);
+  reportYearEl.value = today.getFullYear();
+}
+
+function saveToLocal(){ localStorage.setItem('electrolyser_saved_v1', JSON.stringify(saved)); }
+
+// =====================================================
+// PROCESS CALCULATION ENGINE
+// -----------------------------------------------------
+// ⚠️ DO NOT MODIFY WITHOUT PROCESS / CSP APPROVAL ⚠️
+//
+// Contains:
+// - Current Density (CD)
+// - Avg Cell Voltage
+// - Std Voltage @ 3 / 4 / 5 CD
+// - DC Power @ 3 / 4 / 5 CD
+// - K-Factor (avg & @5CD)
+// - Production (MT/day)
+//
+// Any change here directly affects plant KPIs.
+// =====================================================
+
+function computeFromInputs(inputs){
+  const gen = inputs.generation;
+  const elements = Math.max(1, Number(inputs.elements)||0);
+  const KA = Number(inputs.KA)||0;
+  const totV = Number(inputs.totalV)||0;
+  const conc = Number(inputs.conc)||0;
+  const temp = Number(inputs.temp)||0;
+  const eff = Math.max(0.000001, (Number(inputs.eff)||0)/100);
+
+  const divisor = gen==='6thB+' ? 2.85 : 2.72;
+  const CD = divisor>0 ? KA/divisor : 0;
+  const avgV = elements>0 ? totV/elements : 0;
+
+  // Original K-factor (keep as it is)
+  const K = CD>0 ? (avgV - 2.4)/CD : 0;
+
+  let StdV3 = 0, StdV4 = 0, StdV5 = 0;
+  if (CD > 0) {
+    StdV3 = 2.4 + ((avgV - 2.4) / CD) * 3 - 0.01 * (90 - temp) + 0.02 * (32 - conc);
+    StdV4 = 2.4 + ((avgV - 2.4) / CD) * 4 - 0.013 * (90 - temp) + 0.026 * (32 - conc);
+    if (gen === '6thB+') {
+      StdV5 = 2.4 + ((avgV - 2.4) / CD) * 5 - 0.02 * (90 - temp) + 0.04 * (32 - conc);
+    } else {
+      StdV5 = 2.4 + ((avgV - 2.4) / CD) * 5 - 0.016 * (90 - temp) + 0.033 * (32 - conc);
+    }
+  }
+
+  const K5 = (StdV5 - 2.4) / 5;
+
+  const DC3_kW = (StdV3*1000)/(1.49235*eff);
+  const DC4_kW = (StdV4*1000)/(1.49235*eff);
+  const DC5_kW = (StdV5*1000)/(1.49235*eff);
+const DCAvg_kW = avgV > 0
+  ? (avgV * 1000) / (1.49235 * eff)
+  : 0;
+
+  const Production = (1.49235*elements*KA*24*eff)/1000; // MT/day
+
+  return {
+    generation:gen, elementCount:elements, KA, totalVoltage:totV,
+    cathConc:conc, cathTemp:temp, effPercent:inputs.eff,
+    CD, avgV, K, StdV3, StdV4, StdV5, K5, DC3_kW, DC4_kW, DC5_kW, DCAvg_kW, Production
+  };
+}
+// =====================
+// INPUT VALIDATION
+// =====================
+function trendIcon(current, previous, reverse = false) {
+  if (previous === null || previous === undefined) return '';
+
+  const delta = (current - previous) / previous;
+
+  if (Math.abs(delta) <= 0.01) {
+    return '<span class="trend trend-flat">●</span>';
+  }
+
+  const improved = reverse ? current < previous : current > previous;
+
+  return improved
+    ? '<span class="trend trend-up">▲</span>'
+    : '<span class="trend trend-down">▼</span>';
+}
+function validateInputs(inputs){
+  if(inputs.KA <= 0 || inputs.KA > 16){
+    alert("❌ Current (kA) must be between 0 and 16");
+    return false;
+  }
+
+  if(inputs.totalV <= 0){
+    alert("❌ Total Voltage must be greater than 0");
+    return false;
+  }
+
+  if(inputs.elements <= 0){
+    alert("❌ Number of elements must be greater than 0");
+    return false;
+  }
+
+  if(inputs.temp < 80 || inputs.temp > 90){
+  alert("❌ Catholyte temperature must be between 80 and 90 °C");
+  return false;
+}
+
+if(inputs.conc < 28 || inputs.conc > 32){
+  alert("❌ NaOH concentration must be between 28 and 32 %");
+  return false;
+}
+
+  if(inputs.eff <= 0 || inputs.eff > 100){
+    alert("❌ Efficiency must be between 0 and 100%");
+    return false;
+  }
+
+  return true;
+}
+function clearComputedLive(){
+  outCD.textContent = '-';
+  outAvgV.textContent = '-';
+  outStdV3.textContent = '-';
+  outStdV4.textContent = '-';
+  outStdV5.textContent = '-';
+
+  outDC3.textContent = '-';
+  outDC4.textContent = '-';
+  outDC5.textContent = '-';
+outDCAvg.textContent = '-';
+
+  outK.textContent = '-';
+  outK5.textContent = '-';
+  outProd.textContent = '-';
+}
+
+function computeLive(){
+  const inputs={
+    generation:generationEl.value,
+    elements:elementsEl.value,
+    KA:kaEl.value,
+    totalV:totalVEl.value,
+    conc:concEl.value,
+    temp:tempEl.value,
+    eff:effEl.value
+  };
+
+  if(!validateInputs(inputs)){
+  clearComputedLive();
+  return;
+}
+
+  const c = computeFromInputs(inputs);  // CD & Voltages → 2 decimals
+// =====================
+// ALARM PANEL (LIVE)
+// =====================
+const alarmEl = document.getElementById('alarmPanel');
+
+if (alarmEl && typeof c.StdV5 === 'number') {
+
+  if (c.StdV5 <= 3.0) {
+    alarmEl.textContent =
+      `🟢 Alarm: NORMAL (Std V @5 CD = ${c.StdV5.toFixed(2)} V)`;
+    alarmEl.className = 'status-badge status-normal';
+
+  } else if (c.StdV5 < 3.2) {
+    alarmEl.textContent =
+      `🟡 Alarm: ATTENTION (Std V @5 CD = ${c.StdV5.toFixed(2)} V)`;
+    alarmEl.className = 'status-badge status-attention';
+
+  } else {
+    alarmEl.textContent =
+      `🔴 Alarm: CRITICAL (Std V @5 CD = ${c.StdV5.toFixed(2)} V)`;
+    alarmEl.className = 'status-badge status-critical';
+  }
+}
+outCD.textContent     = c.CD.toFixed(2);
+outAvgV.textContent  = c.avgV.toFixed(2);
+outStdV3.textContent = c.StdV3.toFixed(2);
+outStdV4.textContent = c.StdV4.toFixed(2);
+outStdV5.textContent = c.StdV5.toFixed(2);
+
+// DC Power → INTEGER
+outDC3.textContent = Math.round(c.DC3_kW) + ' kW';
+outDC4.textContent = Math.round(c.DC4_kW) + ' kW';
+outDC5.textContent = Math.round(c.DC5_kW) + ' kW';
+outDCAvg.textContent = Math.round(c.DCAvg_kW) + ' kW';
+
+// K-Factor → 3 decimals
+outK.textContent  = c.K.toFixed(3);
+outK5.textContent = c.K5.toFixed(3);
+
+// Production → INTEGER
+outProd.textContent = Math.round(c.Production);
+  return c;
+}
+
+// apply default generation & efficiency based on electrolyser / rectiformer
+function applyDefaultsForElectrolyser(key){
+  // if record exists, load it instead of applying defaults
+  if(saved[key]){
+    loadRecord(key);
+    return;
+  }
+
+  // generation mapping
+  let gen = generationEl.value;
+  if('ABCDSEFGH'.includes(key)) gen='5thB+';
+  else if('IJKL'.includes(key)) gen='4th';
+  else if('MN'.includes(key)) gen='5th';
+  else if('PQRST'.includes(key)) gen='6thB+';
+  generationEl.value = gen;
+
+  // efficiency mapping by rectiformer
+  const recti = rectiMap[key];
+  let effPreset = null;
+  if(recti==='Rectifier-A' || recti==='Rectifier-B') effPreset = 95;
+  else if(recti==='Rectifier-C' || recti==='Rectifier-D') effPreset = 94;
+  else if(recti==='Rectifier-E' || recti==='Rectifier-F') effPreset = 96.5;
+  if(effPreset !== null) effEl.value = effPreset;
+
+  computeLive();
+}
+
+function renderElectrolyserStatusGrid() {
+  const grid = document.getElementById('statusGrid');
+  if (!grid) return;
+
+  grid.innerHTML = '';
+
+  electrolysers.forEach(k => {
+    let cls = 'status-na';
+
+    if (saved[k]) {
+      const r = computeFromInputs({
+        generation: saved[k].generation,
+        elements: saved[k].elementCount,
+        KA: saved[k].KA,
+        totalV: saved[k].totalVoltage,
+        conc: saved[k].cathConc,
+        temp: saved[k].cathTemp,
+        eff: saved[k].effPercent
+      });
+
+      if (r.StdV5 <= 3.0) cls = 'status-ok';
+      else if (r.StdV5 < 3.2) cls = 'status-warn';
+      else cls = 'status-crit';
+    }
+
+    const cell = document.createElement('div');
+    cell.className = `status-cell ${cls}`;
+    cell.textContent = k;
+
+    grid.appendChild(cell);
+  });
+}
+// render saved + charts for CURRENT plant filter
+function deleteRecord(k){
+  if(!confirm(`Remove unit ${k} from the dashboard? (History will be kept)`)) return;
+  
+  // 1. Remove ONLY from the "Active View"
+  delete saved[k]; 
+  
+  // Note: We do NOT delete from historyData[k] here anymore.
+  
+  // 2. Save the change
+  localStorage.setItem('electrolyser_saved_v1', JSON.stringify(saved));
+  
+  // 3. Refresh the screen
+  renderSaved();
+  renderAllElectrolyserStatus();
+  updatePlantHealth();
+}
+function renderSaved(){
+  const keysAll = Object.keys(saved).sort();
+  savedCountSpan.textContent = keysAll.length;
+
+  // --- SAFETY BLOCK: HANDLE EMPTY STATE ---
+  if(keysAll.length === 0){
+    // 1. Clear Table
+    savedListDiv.innerHTML = '<div style="color:#6b7280; padding:10px;">No saved records.</div>';
+    
+    // 2. Clear Summaries
+    bestWorstDiv.innerHTML = 'No data available.';
+    rectiSummaryDiv.innerHTML = 'No data available.';
+
+    // 3. Wipe ALL Graphs explicitly
+    const allPlots = [stdvPlot, std3Plot, std4Plot, dcPlot, dc3Plot, dc4Plot, dcAvgPlot, rectiPlot];
+    allPlots.forEach(plot => { if(plot) plot.innerHTML = ''; });
+
+    // 4. Reset Health Panel & Matrix explicitly
+    if(document.getElementById('health-total')) {
+        document.getElementById('health-total').innerText = '0';
+        document.getElementById('health-ok').innerText = '0';
+        document.getElementById('health-warn').innerText = '0';
+        document.getElementById('health-crit').innerText = '0';
+    }
+    const matrix = document.getElementById('healthMatrix');
+    if(matrix) matrix.innerHTML = '';
+
+    return; // <--- STOP HERE. This prevents the crash.
+  }
+  // ----------------------------------------
+
+  let html = `
+<table style="width:100%; table-layout:fixed; border-collapse:collapse;">
+<colgroup>
+  <col style="width:50px">
+  <col style="width:90px">
+  <col style="width:90px">
+  <col style="width:80px">
+  <col style="width:80px">
+  <col style="width:80px">
+  <col style="width:80px">
+  <col style="width:80px">
+  <col style="width:110px">
+</colgroup>
+<thead>
+<tr>
+  <th>Ele.</th>
+  <th>Rectifier</th>
+  <th>Plant</th>
+  <th>StdV5 (V)</th>
+  <th>DC5 (kW)</th>
+  <th>K-Factor</th>
+  <th>K @5CD</th>
+  <th>Prod (MT/d)</th>
+  <th>Action</th>
+</tr>
+</thead>
+<tbody>
+`;
+    keysAll.forEach(k=>{
+      const base = saved[k];
+      const rec = computeFromInputs({
+        generation: base.generation,
+        elements: base.elementCount,
+        KA: base.KA,
+        totalV: base.totalVoltage,
+        conc: base.cathConc,
+        temp: base.cathTemp,
+        eff: base.effPercent
+      });
+      html+=`<tr>
+        <td>${k}</td>
+        <td>${base.recti}</td>
+        <td>${base.plant}</td>
+<td class="num">
+  ${rec.StdV5.toFixed(3)}
+  ${trendIcon(rec.StdV5, base.prevStdV5, true)}
+</td>
+<td class="num">
+  ${rec.DC5_kW.toFixed(0)}
+  ${trendIcon(rec.DC5_kW, base.prevDC5, true)}
+</td>
+<td class="num">${rec.K.toFixed(3)}</td>
+<td class="num">${rec.K5.toFixed(3)}</td>
+<td class="num">${rec.Production.toFixed(1)}</td>
+<td>
+  <button class="btn-xs" onclick="loadRecord('${k}')">Load</button>
+  <button class="btn-xs" onclick="deleteRecord('${k}')">Del</button>
+</td>
+      </tr>`;
+    });
+    html+='</tbody></table>';
+    savedListDiv.innerHTML=html;
+
+  const filter = plantFilterEl.value;
+  const keys = keysAll.filter(k=>{
+    if(filter==='ALL') return true;
+    return saved[k].plant === filter;
+  });
+
+  if(keys.length===0){
+    bestWorstDiv.innerHTML='No data for selected plant.';
+    rectiSummaryDiv.innerHTML='No data for selected plant.';
+    // Clear graphs if filter returns nothing
+    [stdvPlot, std3Plot, std4Plot, dcPlot, dc3Plot, dc4Plot, dcAvgPlot, rectiPlot].forEach(p => p.innerHTML='');
+    return;
+  }
+
+  // recompute for charts
+  const list = keys.map(k=>{
+    const base = saved[k];
+    const rec = computeFromInputs({
+      generation: base.generation,
+      elements: base.elementCount,
+      KA: base.KA,
+      totalV: base.totalVoltage,
+      conc: base.cathConc,
+      temp: base.cathTemp,
+      eff: base.effPercent
+    });
+    return {k, rec};
+  });
+
+  const bestStd = list.reduce((a,b)=> b.rec.StdV5 < a.rec.StdV5 ? b : a, list[0]);
+  const worstStd = list.reduce((a,b)=> b.rec.StdV5 > a.rec.StdV5 ? b : a, list[0]);
+  const bestDC = list.reduce((a,b)=> b.rec.DC5_kW < a.rec.DC5_kW ? b : a, list[0]);
+  const worstDC = list.reduce((a,b)=> b.rec.DC5_kW > a.rec.DC5_kW ? b : a, list[0]);
+
+  bestWorstDiv.innerHTML =
+    `<div>Best StdV5 (${filter}): <strong>${bestStd.k}</strong> (${bestStd.rec.StdV5.toFixed(3)} V)</div>
+     <div>Worst StdV5 (${filter}): <strong>${worstStd.k}</strong> (${worstStd.rec.StdV5.toFixed(3)} V)</div>
+     <div style="margin-top:6px">Best DC@5 (${filter}): <strong>${bestDC.k}</strong> (${bestDC.rec.DC5_kW.toFixed(0)} kW)</div>
+     <div>Worst DC@5 (${filter}): <strong>${worstDC.k}</strong> (${worstDC.rec.DC5_kW.toFixed(0)} kW)</div>`;
+
+  const rectiBuckets = {};
+  rectiList.forEach(r => rectiBuckets[r] = []);
+
+  Object.keys(saved).forEach(k=>{
+    const base = saved[k];
+    if(!base || !base.recti) return;
+    if(filter !== 'ALL' && plantMap[base.recti] !== filter) return;
+
+    const rec = computeFromInputs({
+      generation: base.generation,
+      elements: base.elementCount,
+      KA: base.KA,
+      totalV: base.totalVoltage,
+      conc: base.cathConc,
+      temp: base.cathTemp,
+      eff: base.effPercent
+    });
+    rectiBuckets[base.recti].push(rec);
+  });
+
+  let rectHtml = `
+<table style="width:100%; table-layout:fixed; border-collapse:collapse;">
+<colgroup>
+  <col style="width:120px">
+  <col style="width:60px">
+  <col style="width:140px">
+  <col style="width:140px">
+</colgroup>
+<thead>
+<tr>
+  <th>Rectifier</th>
+  <th>Electrolyser</th>
+  <th>Avg Voltage (V)</th>
+  <th>DC Power Average (kWh/MT)</th>
+</tr>
+</thead>
+<tbody>
+`;
+  
+  const rectiStats = rectiList
+    .map(r=>{
+      const arr = rectiBuckets[r] || [];
+      const avg = arr.length
+        ? arr.reduce((s,x)=>s+x.DCAvg_kW,0)/arr.length
+        : null;
+      return { recti:r, count:arr.length, avg };
+    })
+    .filter(r => r.avg !== null);
+
+  const minAvg = rectiStats.length ? Math.min(...rectiStats.map(r=>r.avg)) : 0;
+  const maxAvg = rectiStats.length ? Math.max(...rectiStats.map(r=>r.avg)) : 0;
+
+  rectiList.forEach(recti=>{
+    const plantOfRecti = plantMap[recti];
+    if(filter!=='ALL' && plantOfRecti!==filter) return;
+
+    const arr = rectiBuckets[recti] || [];
+    if(arr.length === 0){
+      rectHtml += `<tr><td>${recti}</td><td>0</td><td>-</td><td>-</td></tr>`;
+      return;
+    }
+
+    const avgStd = arr.reduce((s,x)=>s+x.avgV,0)/arr.length;
+    const avgDc  = arr.reduce((s,x)=>s+x.DCAvg_kW,0)/arr.length;
+
+    let cls = 'recti-mid';
+    if(avgDc === minAvg) cls = 'recti-best';
+    else if(avgDc === maxAvg) cls = 'recti-worst';
+
+    rectHtml += `<tr class="${cls}"><td>${recti}</td><td>${arr.length}</td><td>${avgStd.toFixed(3)}</td><td>${avgDc.toFixed(0)}</td></tr>`;
+  });
+  rectHtml+='</tbody></table>';
+  rectiSummaryDiv.innerHTML = `<div class="recti-table-wrap">${rectHtml}</div>`;
+
+  const std5List = list.map(d=>({k:d.k, v:d.rec.StdV5}));
+  const std3List = list.map(d=>({k:d.k, v:d.rec.StdV3}));
+  const std4List = list.map(d=>({k:d.k, v:d.rec.StdV4}));
+  const dcAvgList = list.map(d=>({k:d.k, v:d.rec.DCAvg_kW}));
+  const dc5List  = list.map(d=>({k:d.k, v:d.rec.DC5_kW}));
+  const dc3List  = list.map(d=>({k:d.k, v:d.rec.DC3_kW}));
+  const dc4List  = list.map(d=>({k:d.k, v:d.rec.DC4_kW}));
+
+  drawStdV5Plot(std5List);
+  drawSingleLine(std3Plot, 'Std V @ 3CD (V)', std3List, '#2563eb');
+  drawSingleLine(std4Plot, 'Std V @ 4CD (V)', std4List, '#ea580c');
+  drawDC5Plot(dc5List);
+  drawSingleLine(dc3Plot, 'DC Power @3 CD(kWh/MT)', dc3List, '#2563eb');
+  drawSingleLine(dc4Plot, 'DC Power @4 CD(kWh/MT)', dc4List, '#ea580c');
+  drawSingleLine(dcAvgPlot, 'DC Power (Avg) (kWh/MT)', dcAvgList, '#16a34a');
+
+  drawRectiPlot(rectiBuckets);
+  
+  saveToLocal();
+  updatePlantHealth();
+}
+function renderAllElectrolyserStatus() {
+  const grid = document.getElementById('statusGrid');
+  if (!grid) return;
+
+  grid.innerHTML = '';
+
+  electrolysers.forEach(el => {
+    let cls = 'status-na';
+
+    if (saved[el]) {
+      const b = saved[el];
+      const r = computeFromInputs({
+        generation: b.generation,
+        elements: b.elementCount,
+        KA: b.KA,
+        totalV: b.totalVoltage,
+        conc: b.cathConc,
+        temp: b.cathTemp,
+        eff: b.effPercent
+      });
+
+      if (r.StdV5 <= 3.0) cls = 'status-normal';
+      else if (r.StdV5 < 3.2) cls = 'status-attention';
+      else cls = 'status-critical';
+    }
+
+    const d = document.createElement('div');
+    d.className = `status-box ${cls}`;
+    d.textContent = el;
+    grid.appendChild(d);
+  });
+}
+// generic single-series line chart (shows point values)
+function drawSingleLine(svgElem, yLabelText, data, strokeColor){
+  svgElem.innerHTML='';
+  if(!data.length) return;
+
+  const W=Math.max(550,data.length*25);
+  const H=300;
+  svgElem.setAttribute('width',W);
+  svgElem.setAttribute('height',H);
+
+  const margin={top:20,right:20,bottom:80,left:70};
+  const iw=W-margin.left-margin.right;
+  const ih=H-margin.top-margin.bottom;
+
+  const xs=i=> margin.left + (data.length===1 ? iw/2 : (i/(data.length-1))*iw);
+  let minV, maxV;
+
+// Fixed engineering ranges
+if (yLabelText.includes('3CD')) {
+  minV = 2.7;
+  maxV = 3.4;
+} else if (yLabelText.includes('4CD')) {
+  minV = 2.7;
+  maxV = 3.4;
+} else if (yLabelText.includes('5CD')) {
+  minV = 2.7;
+  maxV = 3.4;
+} else {
+  // fallback (DC power etc.)
+  minV = Math.min(...data.map(d=>d.v));
+  maxV = Math.max(...data.map(d=>d.v));
+}
+
+  const range = (maxV-minV) || 1;
+  const y=v=> margin.top + ih - ((v-minV)/range)*ih;
+
+  // grid + y labels
+  for(let i=0;i<=4;i++){
+    const yy=margin.top + i*(ih/4);
+    const line=document.createElementNS('http://www.w3.org/2000/svg','line');
+    line.setAttribute('x1',margin.left);line.setAttribute('x2',margin.left+iw);
+    line.setAttribute('y1',yy);line.setAttribute('y2',yy);
+    line.setAttribute('stroke','#e5e7eb');svgElem.appendChild(line);
+
+    const val=minV + (4-i)/4*range;
+    const t=document.createElementNS('http://www.w3.org/2000/svg','text');
+    t.setAttribute('x',margin.left-10);t.setAttribute('y',yy+4);
+    t.setAttribute('text-anchor','end');t.setAttribute('font-size','11');
+    const isDC = yLabelText.includes('DC');
+t.textContent = isDC ? Math.round(val) : val.toFixed(2);
+    svgElem.appendChild(t);
+  }
+
+  // axis labels and x labels
+  data.forEach((d,i)=>{
+    const x=xs(i);
+    const label=document.createElementNS('http://www.w3.org/2000/svg','text');
+    label.setAttribute('x',x);label.setAttribute('y',margin.top+ih+40);
+    label.setAttribute('text-anchor','middle');label.setAttribute('font-size','12');
+    label.textContent=d.k;svgElem.appendChild(label);
+  });
+
+  // path
+  const pathD=data.map((d,i)=>`${i===0?'M':'L'} ${xs(i)} ${y(d.v)}`).join(' ');
+  const path=document.createElementNS('http://www.w3.org/2000/svg','path');
+  path.setAttribute('d',pathD);path.setAttribute('fill','none');path.setAttribute('stroke',strokeColor);path.setAttribute('stroke-width','2');
+  svgElem.appendChild(path);
+
+  // points + values
+  data.forEach((d,i)=>{
+    const x=xs(i), yy=y(d.v);
+    const c=document.createElementNS('http://www.w3.org/2000/svg','circle');
+    c.setAttribute('cx',x);c.setAttribute('cy',yy);c.setAttribute('r',4);c.setAttribute('fill',strokeColor);
+    svgElem.appendChild(c);
+    const vtext=document.createElementNS('http://www.w3.org/2000/svg','text');
+    vtext.setAttribute('x',x);vtext.setAttribute('y',yy-8);vtext.setAttribute('text-anchor','middle');vtext.setAttribute('font-size','10');
+    vtext.setAttribute('fill','#111');
+    const isDC = yLabelText.includes('DC');
+vtext.textContent = isDC ? Math.round(d.v) : d.v.toFixed(2);
+    svgElem.appendChild(vtext);
+  });
+
+  // y-axis label
+  const yLabel=document.createElementNS('http://www.w3.org/2000/svg','text');
+  yLabel.setAttribute('x',margin.left-50);
+  yLabel.setAttribute('y',margin.top+ih/2);
+  yLabel.setAttribute('transform',`rotate(-90 ${margin.left-50} ${margin.top+ih/2})`);
+  yLabel.setAttribute('text-anchor','middle');yLabel.setAttribute('font-size','12');
+  yLabel.textContent=yLabelText;
+  svgElem.appendChild(yLabel);
+}
+
+// StdV5 with green/red and numeric markers
+function drawStdV5Plot(data){
+  stdvPlot.innerHTML='';
+  if(!data.length) return;
+
+  const W = Math.max(550, data.length*25);
+  const H = 340;
+  stdvPlot.setAttribute('width', W);
+  stdvPlot.setAttribute('height', H);
+
+  const margin={top:20,right:20,bottom:80,left:70};
+  const iw=W-margin.left-margin.right;
+  const ih=H-margin.top-margin.bottom;
+
+  const xs=i=> margin.left + (data.length===1 ? iw/2 : (i/(data.length-1))*iw);
+  // Fixed engineering range for Std V @5CD
+const minV = 2.7;
+const maxV = 3.4;
+
+  const range = (maxV-minV) || 1;
+  const y=v=> margin.top + ih - ((v-minV)/range)*ih;
+
+  for(let i=0;i<=4;i++){
+    const yy=margin.top + i*(ih/4);
+    const line=document.createElementNS('http://www.w3.org/2000/svg','line');
+    line.setAttribute('x1',margin.left);line.setAttribute('x2',margin.left+iw);
+    line.setAttribute('y1',yy);line.setAttribute('y2',yy);line.setAttribute('stroke','#e5e7eb');stdvPlot.appendChild(line);
+    const val=minV + (4-i)/4*range;
+    const t=document.createElementNS('http://www.w3.org/2000/svg','text');
+    t.setAttribute('x',margin.left-10);t.setAttribute('y',yy+4);t.setAttribute('text-anchor','end');t.setAttribute('font-size','11');
+    t.textContent = val.toFixed(2);stdvPlot.appendChild(t);
+  }
+
+  data.forEach((d,i)=>{
+    const x=xs(i);
+    const label=document.createElementNS('http://www.w3.org/2000/svg','text');
+    label.setAttribute('x',x);label.setAttribute('y',margin.top+ih+40);
+    label.setAttribute('text-anchor','middle');label.setAttribute('font-size','11');
+    label.textContent=d.k;stdvPlot.appendChild(label);
+  });
+
+  const pathD=data.map((d,i)=>`${i===0?'M':'L'} ${xs(i)} ${y(d.v)}`).join(' ');
+  const path=document.createElementNS('http://www.w3.org/2000/svg','path');
+  path.setAttribute('d',pathD);path.setAttribute('fill','none');path.setAttribute('stroke','#2563eb');path.setAttribute('stroke-width','2');
+  stdvPlot.appendChild(path);
+
+  data.forEach((d,i)=>{
+  const x=xs(i), yy=y(d.v);
+  const color = '#2563eb'; // single blue color
+    const c=document.createElementNS('http://www.w3.org/2000/svg','circle');
+    c.setAttribute('cx',x);c.setAttribute('cy',yy);c.setAttribute('r',5);c.setAttribute('fill',color);stdvPlot.appendChild(c);
+    const vtext=document.createElementNS('http://www.w3.org/2000/svg','text');
+    vtext.setAttribute('x',x);vtext.setAttribute('y',yy-10);vtext.setAttribute('text-anchor','middle');vtext.setAttribute('font-size','10');vtext.textContent = d.v.toFixed(2);
+    stdvPlot.appendChild(vtext);
+  });
+
+  const yLabel=document.createElementNS('http://www.w3.org/2000/svg','text');
+  yLabel.setAttribute('x',margin.left-50);yLabel.setAttribute('y',margin.top+ih/2);
+  yLabel.setAttribute('transform',`rotate(-90 ${margin.left-50} ${margin.top+ih/2})`);
+  yLabel.setAttribute('text-anchor','middle');yLabel.setAttribute('font-size','12');
+  yLabel.textContent='Std V @ 5CD (V)';stdvPlot.appendChild(yLabel);
+}
+
+// DC5 line with numeric markers
+function drawDC5Plot(data){
+  dcPlot.innerHTML='';
+  if(!data.length) return;
+
+  const W=Math.max(550,data.length*25);
+  const H=340;
+  dcPlot.setAttribute('width',W);
+  dcPlot.setAttribute('height',H);
+
+  const margin={top:20,right:20,bottom:80,left:70};
+  const iw=W-margin.left-margin.right;
+  const ih=H-margin.top-margin.bottom;
+
+  const xs=i=> margin.left + (data.length===1 ? iw/2 : (i/(data.length-1))*iw);
+  const maxP=Math.max(...data.map(d=>d.v));
+  const minP=Math.min(...data.map(d=>d.v));
+  const range = (maxP-minP) || 1;
+  const y=p=> margin.top + ih - ((p-minP)/range)*ih;
+
+  for(let i=0;i<=4;i++){
+    const yy=margin.top + i*(ih/4);
+    const line=document.createElementNS('http://www.w3.org/2000/svg','line');
+    line.setAttribute('x1',margin.left);line.setAttribute('x2',margin.left+iw);
+    line.setAttribute('y1',yy);line.setAttribute('y2',yy);line.setAttribute('stroke','#e5e7eb');dcPlot.appendChild(line);
+    const val=minP + (4-i)/4*range;
+    const t=document.createElementNS('http://www.w3.org/2000/svg','text');
+    t.setAttribute('x',margin.left-10);t.setAttribute('y',yy+4);t.setAttribute('text-anchor','end');t.setAttribute('font-size','11');
+    t.textContent = Math.round(val);dcPlot.appendChild(t);
+  }
+
+  data.forEach((d,i)=>{
+    const x=xs(i);
+    const label=document.createElementNS('http://www.w3.org/2000/svg','text');
+    label.setAttribute('x',x);label.setAttribute('y',margin.top+ih+40);
+    label.setAttribute('text-anchor','middle');label.setAttribute('font-size','11');
+    label.textContent=d.k;dcPlot.appendChild(label);
+  });
+
+  const pathD=data.map((d,i)=>`${i===0?'M':'L'} ${xs(i)} ${y(d.v)}`).join(' ');
+  const path=document.createElementNS('http://www.w3.org/2000/svg','path');
+  path.setAttribute('d',pathD);path.setAttribute('fill','none');path.setAttribute('stroke','#ea580c');path.setAttribute('stroke-width','2');
+  dcPlot.appendChild(path);
+
+  data.forEach((d,i)=>{
+  const x=xs(i), yy=y(d.v);
+  const color = '#ea580c'; // single orange color
+
+    const c=document.createElementNS('http://www.w3.org/2000/svg','circle');
+    c.setAttribute('cx',x);c.setAttribute('cy',yy);c.setAttribute('r',5);c.setAttribute('fill',color);dcPlot.appendChild(c);
+    const vtext=document.createElementNS('http://www.w3.org/2000/svg','text');
+    vtext.setAttribute('x',x);vtext.setAttribute('y',yy-10);vtext.setAttribute('text-anchor','middle');vtext.setAttribute('font-size','10');vtext.textContent = Math.round(d.v);
+    dcPlot.appendChild(vtext);
+  });
+
+  const yLabel=document.createElementNS('http://www.w3.org/2000/svg','text');
+  yLabel.setAttribute('x',margin.left-50);yLabel.setAttribute('y',margin.top+ih/2);
+  yLabel.setAttribute('transform',`rotate(-90 ${margin.left-50} ${margin.top+ih/2})`);
+  yLabel.setAttribute('text-anchor','middle');yLabel.setAttribute('font-size','12');
+  yLabel.textContent='DC Power @5 CD (kWh/MT)';dcPlot.appendChild(yLabel);
+}
+
+// rectiformer column chart with numbers on bars
+function drawRectiPlot(buckets){
+  rectiPlot.innerHTML='';
+  const filter = plantFilterEl.value;
+
+  const arr=rectiList
+    .filter(recti => filter==='ALL' || plantMap[recti]===filter)
+    .map(recti=>{
+      const list=buckets[recti]||[];
+      const avg=list.length?list.reduce((s,x)=>s+x.DC5_kW,0)/list.length:0;
+      return {recti,avg,count:list.length};
+    });
+
+  const anyData=arr.some(a=>a.count>0);
+  if(!anyData){
+    rectiPlot.setAttribute('width',600);
+    rectiPlot.setAttribute('height',200);
+    const t=document.createElementNS('http://www.w3.org/2000/svg','text');
+    t.setAttribute('x',20);t.setAttribute('y',40);t.textContent='No rectiformer data yet for selected plant.';
+    t.setAttribute('font-size','14');
+    rectiPlot.appendChild(t);
+    return;
+  }
+
+  const valid=arr.filter(a=>a.count>0);
+  const maxAvg=Math.max(...valid.map(a=>a.avg));
+  const minAvg=Math.min(...valid.map(a=>a.avg));
+
+  const W= Math.max(550, arr.length*90);
+  const H=340;
+  rectiPlot.setAttribute('width',W);
+  rectiPlot.setAttribute('height',H);
+
+  const margin={top:20,right:20,bottom:80,left:70};
+  const iw=W-margin.left-margin.right;
+  const ih=H-margin.top-margin.bottom;
+
+  const barWidth= iw/arr.length * 0.5;
+  const xPos=i=> margin.left + (i+0.5)*(iw/arr.length);
+
+  for(let i=0;i<=4;i++){
+    const yy=margin.top + i*(ih/4);
+    const line=document.createElementNS('http://www.w3.org/2000/svg','line');
+    line.setAttribute('x1',margin.left);line.setAttribute('x2',margin.left+iw);
+    line.setAttribute('y1',yy);line.setAttribute('y2',yy);line.setAttribute('stroke','#e5e7eb');rectiPlot.appendChild(line);
+    const val = (maxAvg*(4-i))/4;
+    const t=document.createElementNS('http://www.w3.org/2000/svg','text');
+    t.setAttribute('x',margin.left-10);t.setAttribute('y',yy+4);
+    t.setAttribute('text-anchor','end');t.setAttribute('font-size','11');
+    t.textContent = isFinite(val) ? Math.round(val) : '0';
+    rectiPlot.appendChild(t);
+  }
+
+  const yLabel=document.createElementNS('http://www.w3.org/2000/svg','text');
+  yLabel.setAttribute('x',margin.left-50);
+  yLabel.setAttribute('y',margin.top+ih/2);
+  yLabel.setAttribute('transform',`rotate(-90 ${margin.left-50} ${margin.top+ih/2})`);
+  yLabel.setAttribute('text-anchor','middle');
+  yLabel.setAttribute('font-size','12');
+  yLabel.textContent='Avg DC@5 (kW)';
+  rectiPlot.appendChild(yLabel);
+
+  arr.forEach((item,i)=>{
+    const x = xPos(i) - barWidth/2;
+    const h = item.count>0 && maxAvg>0 ? (item.avg/maxAvg)*ih : 0;
+    let color='#9ca3af';
+    if(item.count>0){
+      if(item.avg===minAvg) color='#16a34a';
+      else if(item.avg===maxAvg) color='#dc2626';
+      else color='#2563eb';
+    }
+    const yTop = margin.top + ih - h;
+
+    const rect=document.createElementNS('http://www.w3.org/2000/svg','rect');
+    rect.setAttribute('x',x);rect.setAttribute('y',yTop);
+    rect.setAttribute('width',barWidth);rect.setAttribute('height',h);
+    rect.setAttribute('fill',color);
+    rectiPlot.appendChild(rect);
+
+    const label=document.createElementNS('http://www.w3.org/2000/svg','text');
+    label.setAttribute('x',xPos(i));
+    label.setAttribute('y',margin.top+ih+40);
+    label.setAttribute('text-anchor','middle');
+    label.setAttribute('font-size','11');
+    label.textContent=item.recti;
+    rectiPlot.appendChild(label);
+
+    const valLabel=document.createElementNS('http://www.w3.org/2000/svg','text');
+    valLabel.setAttribute('x',xPos(i));
+    valLabel.setAttribute('y',yTop-8);
+    valLabel.setAttribute('text-anchor','middle');
+    valLabel.setAttribute('font-size','11');
+    valLabel.textContent = item.count>0 ? Math.round(item.avg) : '-';
+    rectiPlot.appendChild(valLabel);
+  });
+}
+
+// show/hide graphs based on dropdown
+function updateGraphVisibility() {
+    const val = document.getElementById('graphSelector').value;
+
+    // 1. Get references to all your chart cards
+    // Make sure these IDs match the IDs used in your HTML <div> tags
+    const cardStdV = document.getElementById('cardStdV');
+    const cardStd3 = document.getElementById('cardStd3');
+    const cardStd4 = document.getElementById('cardStd4');
+    const cardDC = document.getElementById('cardDC');     // This is usually DC5
+    const cardDC3 = document.getElementById('cardDC3');
+    const cardDC4 = document.getElementById('cardDC4');
+    const cardRecti = document.getElementById('cardRectifier');
+    const cardDCAvg = document.getElementById('cardDCAvg'); // Check if your DC Avg card has this ID!
+
+    // 2. Create a list of all cards to hide them all first
+    const allCards = [cardStdV, cardStd3, cardStd4, cardDC, cardDC3, cardDC4, cardRectifier, cardDCAvg];
+
+    // 3. Hide everything first
+    allCards.forEach(card => { if(card) card.style.display = 'none'; });
+
+    // 4. Show only the one selected
+    if (val === 'ALL') {
+        allCards.forEach(card => { if(card) card.style.display = 'block'; });
+    } else if (val === 'STDV') { if(cardStdV) cardStdV.style.display = 'block'; }
+    else if (val === 'STD3') { if(cardStd3) cardStd3.style.display = 'block'; }
+    else if (val === 'STD4') { if(cardStd4) cardStd4.style.display = 'block'; }
+    else if (val === 'DC5')  { if(cardDC)   cardDC.style.display = 'block'; }
+    else if (val === 'DC3')  { if(cardDC3)  cardDC3.style.display = 'block'; }
+    else if (val === 'DC4')  { if(cardDC4)  cardDC4.style.display = 'block'; }
+    else if (val === 'RECTIFIER') { if(cardRectifier) cardRectifier
+.style.display = 'block'; }
+    else if (val === 'DCAVG') { if(cardDCAvg) cardDCAvg.style.display = 'block'; }
+
+    // 5. Important: Re-render the data so the SVG actually draws in the visible box
+    renderSaved();
+}
+// load / delete / save
+function loadRecord(k){
+  const r=saved[k];
+  if(!r) return;
+  selElectrolyser.value=k;
+  generationEl.value=r.generation;
+  elementsEl.value=r.elementCount;
+  kaEl.value=r.KA;
+  totalVEl.value=r.totalVoltage;
+  effEl.value=r.effPercent;
+  concEl.value=r.cathConc;
+  tempEl.value=r.cathTemp;
+  computeLive();
+}
+
+function deleteRecord(k){
+  delete saved[k];
+  delete historyData[k]; // Delete history too
+  
+  localStorage.setItem('electrolyser_saved_v1', JSON.stringify(saved));
+  localStorage.setItem('electrolyser_history_v1', JSON.stringify(historyData));
+  
+  renderSaved();
+}
+function saveCurrent(){
+  const key=selElectrolyser.value;
+  const inputs={
+    generation:generationEl.value,
+    elements:elementsEl.value,
+    KA:kaEl.value,
+    totalV:totalVEl.value,
+    conc:concEl.value,
+    temp:tempEl.value,
+    eff:effEl.value
+  };
+
+  if(!validateInputs(inputs)) return;
+
+  const rec=computeFromInputs(inputs);
+  rec.electrolyser=key;
+  rec.recti=rectiMap[key];
+  rec.plant=plantMap[rec.recti]||'Unknown';
+  
+  const now = new Date();
+  const indianDate = new Intl.DateTimeFormat('en-IN', {
+      timeZone: 'Asia/Kolkata',
+      year: 'numeric', month: '2-digit', day: '2-digit'
+  }).format(now).split('/').reverse().join('-'); // Returns YYYY-MM-DD
+
+  const indianTimestamp = new Intl.DateTimeFormat('en-IN', {
+      timeZone: 'Asia/Kolkata',
+      year: 'numeric', month: '2-digit', day: '2-digit',
+      hour: '2-digit', minute: '2-digit', second: '2-digit',
+      hour12: true
+  }).format(now);
+
+  rec.shift = shiftSelectorEl ? shiftSelectorEl.value : '-';
+  rec.date = indianDate;
+  rec.timestamp = indianTimestamp;
+
+  // 1. CALCULATE TRENDS (Compare with previous latest)
+  if (saved[key]) {
+    rec.prevStdV5 = saved[key].StdV5;
+    rec.prevDC5  = saved[key].DC5_kW;
+  }
+
+  // 2. SAVE LATEST (For Dashboard/Graphs)
+  saved[key]=rec;
+
+  // 3. SAVE HISTORY (For Export - Limit 30)
+  if (!historyData[key]) historyData[key] = [];
+  
+  historyData[key].push(rec);
+
+  // Remove oldest if more than 30
+  if (historyData[key].length > 30) {
+    historyData[key].shift(); 
+  }
+
+  // 4. PERSIST TO STORAGE
+  localStorage.setItem('electrolyser_saved_v1', JSON.stringify(saved));
+  localStorage.setItem('electrolyser_history_v1', JSON.stringify(historyData));
+
+  renderSaved();
+  renderAllElectrolyserStatus();
+  
+  // Optional: Visual confirmation
+  alert(`Saved! (History count for ${key}: ${historyData[key].length}/30)`);
+}
+// buttons
+// 1. SAVE BUTTON
+document.getElementById('saveBtn').addEventListener('click', saveCurrent);
+
+// 2. LOAD BUTTON
+document.getElementById('loadBtn').addEventListener('click', () => loadRecord(selElectrolyser.value));
+
+// 4. RESET DASHBOARD (Orange Button)
+// Clears screen for new shift, keeps history in background
+document.getElementById('resetViewBtn').addEventListener('click', () => {
+    if (confirm('Start new shift? (Clears Dashboard, Keeps History)')) {
+        saved = {}; 
+        localStorage.removeItem('electrolyser_saved_v1'); // Clear active session memory
+        
+        // Note: We do NOT clear historyData here
+        
+        if(typeof clearComputedLive === 'function') clearComputedLive();
+        
+        renderSaved(); // This will now show 0 because updatePlantHealth only looks at 'saved'
+    }
+});
+
+// ==========================================
+// 1. DELETE (Individual/Active Unit)
+// ==========================================
+// This should ONLY remove the unit currently showing in the table/panel
+function deleteRecord(k){
+    if(!confirm(`Remove unit ${k} from the active dashboard?`)) return;
+    
+    // Remove only from 'saved' object
+    delete saved[k]; 
+    
+    // Update Storage for the active session
+    localStorage.setItem('electrolyser_saved_v1', JSON.stringify(saved));
+    
+    // Refresh UI
+    renderSaved();
+    updatePlantHealth();
+}
+
+// ==========================================
+// 2. DELETE ALL RECORDS (Factory Reset)
+// ==========================================
+// This should wipe EVERYTHING: active data AND historical data
+document.getElementById('clearAllBtn').addEventListener('click', () => {
+    if (confirm('⚠️ PERMANENT WIPE: This will delete all history and current data from the App storage. Continue?')) {
+        
+        // A. Clear the JavaScript memory variables
+        saved = {};
+        historyData = {};
+
+        // B. Clear the App's physical storage (Crucial for Mobile Apps)
+        localStorage.clear(); 
+
+        // C. Reset the Input Boxes to standard defaults (Gen 5, 140 elements, etc.)
+        // This prevents the "0 to 16 KA" mismatch errors
+        const currentId = selElectrolyser.value;
+        applyDefaultsForElectrolyser(currentId);
+
+        // D. Clear the Live Result numbers
+        clearComputedLive();
+
+        // E. Force the UI to update
+        renderSaved(); 
+        updatePlantHealth();
+        
+        alert("App storage cleared successfully.");
+    }
+});
+document.getElementById('exportCsvBtn').addEventListener('click', () => {
+  const rows = [['Electrolyser', 'Rectifier', 'Plant', 'Date', 'Shift', 'KA', 'TotalV', 'StdV5', 'DC5_kW', 'Production', 'Timestamp']];
+
+  // Loop through all Electrolysers in history
+  Object.keys(historyData).sort().forEach(k => {
+    // Loop through ALL saved entries for this Electrolyser
+    historyData[k].forEach(base => {
+      // Re-calculate to ensure data consistency (optional, but safe)
+      const r = computeFromInputs({
+        generation: base.generation,
+        elements: base.elementCount,
+        KA: base.KA,
+        totalV: base.totalVoltage,
+        conc: base.cathConc,
+        temp: base.cathTemp,
+        eff: base.effPercent
+      });
+
+      rows.push([
+        k, 
+        base.recti, 
+        base.plant, 
+        base.date,
+        base.shift || '-',
+        r.KA, 
+        r.totalVoltage, 
+        r.StdV5.toFixed(4), 
+        r.DC5_kW.toFixed(3), 
+        r.Production.toFixed(3),
+        base.timestamp
+      ]);
+    });
+  });
+
+  const csv = rows.map(r => r.join(',')).join('\n');
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'electrolyser_history_30_entries.csv';
+  a.click();
+  URL.revokeObjectURL(url);
+});
+// export graphs + summary to PDF (includes embedded logo in header if provided)
+document.getElementById('exportPdfBtn').addEventListener('click',()=>{
+  const svg1 = stdvPlot.outerHTML;
+  const svg2 = dcPlot.outerHTML;
+  const svg3 = rectiPlot.outerHTML;
+  const svg4 = std3Plot.outerHTML;
+  const svg5 = std4Plot.outerHTML;
+  const svg6 = dc3Plot.outerHTML;
+  const svg7 = dc4Plot.outerHTML;
+  const nameStr = operatorNameEl.value || 'N/A';
+  const filter = plantFilterEl.value;
+
+  const day = parseInt(reportDayEl.value,10);
+  const month = parseInt(reportMonthEl.value,10);
+  const year = parseInt(reportYearEl.value,10);
+  let dateStr;
+  if(!isNaN(day) && !isNaN(month) && !isNaN(year)){
+    const dd = String(day).padStart(2,'0');
+    const mm = String(month).padStart(2,'0');
+    dateStr = `${dd}-${mm}-${year}`;
+  } else {
+    const today = new Date();
+    dateStr = today.toISOString().slice(0,10);
+  }
+
+  const keysAll = Object.keys(saved).sort();
+  const keys = keysAll.filter(k=>{
+    if(filter==='ALL') return true;
+    return saved[k].plant === filter;
+  });
+  let summaryHtml='';
+  if(keys.length>0){
+    const list = keys.map(k=>{
+      const base = saved[k];
+      const rec = computeFromInputs({
+        generation: base.generation,
+        elements: base.elementCount,
+        KA: base.KA,
+        totalV: base.totalVoltage,
+        conc: base.cathConc,
+        temp: base.cathTemp,
+        eff: base.effPercent
+      });
+      return {k, rec};
+    });
+    const bestStd = list.reduce((a,b)=> b.rec.StdV5 < a.rec.StdV5 ? b : a, list[0]);
+    const worstStd = list.reduce((a,b)=> b.rec.StdV5 > a.rec.StdV5 ? b : a, list[0]);
+    const bestDC = list.reduce((a,b)=> b.rec.DC5_kW < a.rec.DC5_kW ? b : a, list[0]);
+    const worstDC = list.reduce((a,b)=> b.rec.DC5_kW > a.rec.DC5_kW ? b : a, list[0]);
+
+    const rectiBuckets={};
+    rectiList.forEach(r=>rectiBuckets[r]=[]);
+    list.forEach(item=>{
+      const base = saved[item.k];
+      if(base && base.recti) rectiBuckets[base.recti].push(item.rec);
+    });
+    const rectiStats = rectiList
+      .filter(recti=>filter==='ALL' || plantMap[recti]===filter)
+      .map(recti=>{
+        const arr = rectiBuckets[recti]||[];
+        const avg = arr.length?arr.reduce((s,x)=>s+x.DC5_kW,0)/arr.length:Infinity;
+        return {recti,avg,count:arr.length};
+      })
+      .filter(x=>x.count>0);
+
+    let bestRecti = {recti:'-',avg:0}, worstRecti={recti:'-',avg:0};
+    if(rectiStats.length>0){
+      bestRecti = rectiStats.reduce((a,b)=> a.avg<b.avg ? a : b);
+      worstRecti = rectiStats.reduce((a,b)=> a.avg>b.avg ? a : b);
+    }
+
+    summaryHtml = `
+      <table border="1" cellspacing="0" cellpadding="4" style="border-collapse:collapse;font-size:12px;">
+        <thead>
+          <tr><th colspan="3">Performance Summary (Plant Filter: ${filter})</th></tr>
+          <tr><th>Metric</th><th>Best</th><th>Worst</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>StdV5 (V)</td><td>${bestStd.k} (${bestStd.rec.StdV5.toFixed(4)})</td><td>${worstStd.k} (${worstStd.rec.StdV5.toFixed(4)})</td></tr>
+          <tr><td>DC@5 (kW)</td><td>${bestDC.k} (${bestDC.rec.DC5_kW.toFixed(3)})</td><td>${worstDC.k} (${worstDC.rec.DC5_kW.toFixed(3)})</td></tr>
+          <tr><td>Rectifier Avg DC@5</td><td>${bestRecti.recti} (${bestRecti.avg.toFixed(3)} kW)</td><td>${worstRecti.recti} (${worstRecti.avg.toFixed(3)} kW)</td></tr>
+        </tbody>
+      </table>`;
+  } else {
+    summaryHtml = `<p style="font-size:12px;">No data for selected plant filter.</p>`;
+  }
+
+  // Prepare header logo for PDF: use same base64 if available in UI img
+  const uiImg = document.getElementById('uiLogo');
+  let pdfLogoHtml = '';
+  if(uiImg && uiImg.src && uiImg.src.startsWith('data:')) {
+    pdfLogoHtml = `<img src="${uiImg.src}" alt="logo" style="height:48px;object-fit:contain;" />`;
+  } else {
+    // fallback to inline tiny SVG placeholder
+    pdfLogoHtml = `<svg width="140" height="56" viewBox="0 0 280 112" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Company logo">
+      <rect width="100%" height="100%" rx="8" fill="#0b69ff"/>
+      <text x="24" y="72" font-family="Arial, Helvetica, sans-serif" font-size="64" fill="#ffffff">GACL</text>
+    </svg>`;
+  }
+
+  const w = window.open('', '_blank');
+  w.document.write(`<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>Electrolyser Graphs Report</title>
+<style>
+  body{font-family:Arial,Helvetica,sans-serif;padding:18px;}
+  h1{margin-bottom:4px;}
+  h2{margin-bottom:6px;}
+  p.meta{font-size:12px;margin:2px 0;}
+  p.note{font-size:12px;color:#555;margin-top:4px;margin-bottom:10px;}
+  .block{page-break-inside:avoid;margin-bottom:24px;}
+  .header{display:flex;align-items:center;gap:12px;margin-bottom:8px}
+  .header img{height:48px}
+</style>
+</head>
+<body>
+  <div class="header">
+    ${pdfLogoHtml}
+    <div>
+      <h1 style="margin:0;">Electrolyser Performance Graphs</h1>
+    </div>
+  </div>
+
+  <p class="meta">Date: ${dateStr || ''}</p>
+  <p class="meta">Name: ${nameStr || ''}</p>
+  <p class="meta">Plant filter: ${filter}</p>
+<p class="meta">Shift: ${shiftSelectorEl ? shiftSelectorEl.value : '-'}</p>
+ <p class="note">Color code on StdV5/DC5: Green = best (lowest value), Red = worst (highest value).</p>
+
+  <div class="block">
+    <h2>Summary (StdV5 / DC@5 / Rectifier)</h2>
+    ${summaryHtml}
+  </div>
+
+  <div class="block">
+    <h2>Std V @ 5CD per Electrolyser (V)</h2>
+    ${svg1}
+  </div>
+  <div class="block">
+    <h2>Std V @ 3CD per Electrolyser (V)</h2>
+    ${svg4}
+  </div>
+  <div class="block">
+    <h2>Std V @ 4CD per Electrolyser (V)</h2>
+    ${svg5}
+  </div>
+  <div class="block">
+    <h2>DC Power @5 CD per Electrolyser (kWh/MT)</h2>
+    ${svg2}
+  </div>
+  <div class="block">
+    <h2>DC Power @3 CD per Electrolyser (kWh/MT)</h2>
+    ${svg6}
+  </div>
+  <div class="block">
+    <h2>DC Power @4 CD per Electrolyser (kWh/MT)</h2>
+    ${svg7}
+  </div>
+  <div class="block">
+    <h2>Rectifier Average DC Power @5 CD (kWh/MT)</h2>
+    ${svg3}
+  </div>
+</body>
+</html>`);
+  w.document.close();
+  setTimeout(()=>w.print(),300);
+});
+
+// export full data (all cells) to PDF (includes embedded logo in header if provided)
+document.getElementById('exportDataPdfBtn').addEventListener('click',()=>{
+  const nameStr = operatorNameEl.value || 'N/A';
+
+  const day = parseInt(reportDayEl.value,10);
+  const month = parseInt(reportMonthEl.value,10);
+  const year = parseInt(reportYearEl.value,10);
+  let dateStr;
+  if(!isNaN(day) && !isNaN(month) && !isNaN(year)){
+    const dd = String(day).padStart(2,'0');
+    const mm = String(month).padStart(2,'0');
+    dateStr = `${dd}-${mm}-${year}`;
+  } else {
+    const today = new Date();
+    dateStr = today.toISOString().slice(0,10);
+  }
+
+  const keysAll = Object.keys(saved).sort();
+  if(keysAll.length===0){
+    alert('No data to export.');
+    return;
+  }
+
+  let tableHtml = `
+    <table border="1" cellspacing="1" cellpadding="8" style="border-collapse:collapse;font-size:11px;width:100%;text-align: center;">
+      <thead>
+        <tr>
+          <th>Rectifier</th><th>Plant</th><th>El</th><th>Gen</th>
+          <th>Element</th><th>KA</th><th>TotV</th>
+          <th>Conc</th><th>Temp</th><th>Eff%</th>
+          <th>CD</th><th>AvgV</th>
+          <th>StdV5CD</th>
+          <th>DCP@5CD</th>
+          <th>K-Factor</th><th>K-F@5CD</th>
+          <th>Prod (MT/d)</th><th>Saved At</th>
+        </tr>
+      </thead>
+      <tbody>
+  `;
+  keysAll.forEach(k=>{
+    const base = saved[k];
+    const r = computeFromInputs({
+      generation: base.generation,
+      elements: base.elementCount,
+      KA: base.KA,
+      totalV: base.totalVoltage,
+      conc: base.cathConc,
+      temp: base.cathTemp,
+      eff: base.effPercent
+    });
+    tableHtml += `
+      <tr>
+	
+        <td>${base.recti}</td>
+        <td>${base.plant}</td>
+	<td>${k}</td>
+        <td>${r.generation}</td>
+        <td>${r.elementCount}</td>
+        <td>${r.KA}</td>
+        <td>${r.totalVoltage}</td>
+        <td>${r.cathConc}</td>
+        <td>${r.cathTemp}</td>
+        <td>${r.effPercent}</td>
+        <td>${r.CD.toFixed(2)}</td>
+        <td>${r.avgV.toFixed(2)}</td>
+        <td>${r.StdV5.toFixed(2)}</td>
+        <td>${r.DC5_kW.toFixed(0)}</td>
+        <td>${r.K.toFixed(3)}</td>
+        <td>${r.K5.toFixed(3)}</td>
+        <td>${r.Production.toFixed(1)}</td>
+        <td>${base.timestamp}</td>
+      </tr>
+    `;
+  });
+  tableHtml += '</tbody></table>';
+
+  const uiImg = document.getElementById('uiLogo');
+  let pdfLogoHtml = '';
+  if(uiImg && uiImg.src && uiImg.src.startsWith('data:')) {
+    pdfLogoHtml = `<img src="${uiImg.src}" alt="logo" style="height:48px;object-fit:contain;" />`;
+  } else {
+    pdfLogoHtml = `<svg width="140" height="56" viewBox="0 0 280 112" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Company logo">
+      <rect width="100%" height="100%" rx="8" fill="#0b69ff"/><text x="24" y="72" font-family="Arial, Helvetica, sans-serif" font-size="64" fill="#ffffff">GACL</text>
+    </svg>`;
+  }
+
+  const w = window.open('', '_blank');
+  w.document.write(`<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>Electrolyser Data Report</title>
+<style>
+  body{font-family:Arial,Helvetica,sans-serif;padding:18px;}
+  h1{margin-bottom:4px;}
+  p.meta{font-size:12px;margin:2px 0;}
+  .block{page-break-inside:avoid;margin-bottom:24px;}
+  .header{display:flex;align-items:center;gap:12px;margin-bottom:8px}
+  .header img{height:48px}
+</style>
+</head>
+<body>
+  <div class="header">
+    ${pdfLogoHtml}
+    <div>
+      <h1 style="margin:0;">Electrolyser Data Report</h1>
+          </div>
+  </div>
+
+  <p class="meta">Date: ${dateStr}</p>
+  <p class="meta">Name: ${nameStr}</p>
+<p class="meta">Shift: ${shiftSelectorEl ? shiftSelectorEl.value : '-'}</p>
+
+
+  <div class="block">
+    ${tableHtml}
+  </div>
+</body>
+</html>`);
+  w.document.close();
+  setTimeout(()=>w.print(),300);
+});
+
+// live compute
+[ generationEl,elementsEl,kaEl,totalVEl,effEl,concEl,tempEl ].forEach(el=>el.addEventListener('input',computeLive));
+plantFilterEl.addEventListener('change', renderSaved);
+
+selElectrolyser.addEventListener('change', () => applyDefaultsForElectrolyser(selElectrolyser.value));
+// =====================
+// SIMPLE / EXPERT MODE
+// =====================
+const modeSelector = document.getElementById('modeSelector');
+
+function applyMode(){
+  const mode = modeSelector.value;
+  document.querySelectorAll('.expert-only').forEach(el=>{
+    el.style.display = (mode === 'EXPERT') ? '' : 'none';
+  });
+
+  if(mode === 'SIMPLE'){
+    // Hide everything in Simple mode
+    [cardStdV, cardStd3, cardStd4, cardDC, cardDC3, cardDC4, cardDCAvg, cardRectifier].forEach(c => {
+       if(c) c.style.display = 'none';
+    });
+  } else {
+   
+  }
+}
+// Mode change handler
+modeSelector.addEventListener('change', applyMode);
+
+// init
+function init(){
+  initDateSelectors();
+  selElectrolyser.value = electrolysers[0];
+  applyDefaultsForElectrolyser(selElectrolyser.value);
+  renderSaved();
+renderAllElectrolyserStatus();
+updatePlantHealth();
+  applyMode(); // 👈 MUST be last
+}
+
+init();
+
+// expose for table buttons
+window.loadRecord=loadRecord;
+window.deleteRecord=deleteRecord;
+</script>
+<script>
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./service-worker.js')
+            .then(reg => {
+                console.log('SW Registered');
+                // Check for updates
+                reg.onupdatefound = () => {
+                    const installingWorker = reg.installing;
+                    installingWorker.onstatechange = () => {
+                        if (installingWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                            alert('New update available! Close and reopen the app to apply.');
+                        }
+                    };
+                };
+            })
+            .catch(err => console.log('SW Registration Failed', err));
+    });
+}
+// Add this at the bottom of your script
+document.getElementById('btnGenerateGraph').addEventListener('click', updateGraphVisibility);
+</script>
+</body>
+</html>
